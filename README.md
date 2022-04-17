@@ -55,3 +55,22 @@ Project Organization
 --------
 
 <p><small>Project based on the <a target="_blank" href="https://drivendata.github.io/cookiecutter-data-science/">cookiecutter data science project template</a>. #cookiecutterdatascience</small></p>
+
+
+Before start:
+- Create a virtual environment
+```bash
+python -m venv .venv
+```
+- Activate the virtual environment (if you are using Bash)
+```bash
+source .venv/Scripts/activate
+```
+- Install the requirements to develop
+```bash
+pip install -r requirements-dev.txt
+```
+- Install the requirements to run
+```bash
+pip install -r requirements.txt
+```
