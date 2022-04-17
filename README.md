@@ -3,6 +3,10 @@ steel_industry
 
 A short description of the project.
 
+Team:
+- Gustavo
+- Marco
+
 Project Organization
 ------------
 
