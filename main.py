@@ -4,8 +4,6 @@ Este projeto usa o Streamlit.
 """
 # %%
 from dotenv import dotenv_values
-import json
-import pandas as pd
 
 from src.data.brasil_io import BrasilIO
 

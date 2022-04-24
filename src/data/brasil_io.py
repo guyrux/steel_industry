@@ -1,20 +1,21 @@
 """
 Esse módulo foi tirado do repo do @Turicas: https://gist.github.com/turicas/3e3621d61415e3453cd03a1997f7473f
+Porém, eu não consegui usar e fiz algumas adaptações.
 
-O propósito desse módulo é facilicar o consumo da API do BrasilIO.
+O propósito desse módulo é facilitar o consumo da API do BrasilIO.
 """
-
-import csv
-import gzip
-import io
+# %%
+from dotenv import dotenv_values
 import json
-from urllib.parse import urlencode, urljoin
-from urllib.request import Request, urlopen
+import pandas as pd
+import requests
+
+BASE_URL = "https://api.brasil.io/v1/"
+
+key = dotenv_values('../../.env')['BRASIL_IO_KEY']
 
 
 class BrasilIO:
-
-    base_url = "https://api.brasil.io/v1/"
 
     def __init__(self, auth_token):
         self.__auth_token = auth_token
@@ -31,61 +32,28 @@ class BrasilIO:
         data.update({"Authorization": f"Token {self.__auth_token}"})
         return data
 
-    def api_request(self, path, query_string=None):
-        url = urljoin(self.base_url, path)
-        if query_string:
-            url += "?" + urlencode(query_string)
-        request = Request(url, headers=self.api_headers)
-        response = urlopen(request)
-        return json.load(response)
+    def api_request(self, dataset_slug: str, table_name: str, query_string: str = 1) -> json:
+        response = requests.get(
+            BASE_URL + f'dataset/{dataset_slug}/{table_name}/data?page={query_string}',
+            headers=self.api_headers
+            )
 
-    def data(self, dataset_slug, table_name, filters=None):
-        url = f"dataset/{dataset_slug}/{table_name}/data/"
-        filters = filters or {}
-        filters["page"] = 1
+        if response.status_code == 200:
+            json_gastos_parlamentares = json.loads(response.content)
+            return json_gastos_parlamentares
 
-        finished = False
-        while not finished:
-            response = self.request(url, filters)
-            next_page = response.get("next", None)
-            for row in response["results"]:
-                yield row
-            filters = {}
-            url = next_page
-            finished = next_page is None
-
-    def download(self, dataset, table_name):
-        url = f"https://data.brasil.io/dataset/{dataset}/{table_name}.csv.gz"
-        request = Request(url, headers=self.headers)
-        response = urlopen(request)
-        return response
+        else:
+            return None
 
 
 if __name__ == "__main__":
-    api = BrasilIO("meu-api-token")
-    dataset_slug = "covid19"
-    table_name = "caso_full"
+    api = BrasilIO(key)
+    dataset_slug = 'gastos-deputados'
+    table_name = 'cota_parlamentar'
 
-    # Para baixar o arquivo completo:
+    temp = api.api_request(
+        dataset_slug=dataset_slug, table_name=table_name
+        )
 
-    # Após fazer o download, você salvá-lo no disco ou percorrer o arquivo em
-    # memória. Para salvá-lo no disco:
-    response = api.download(dataset_slug, table_name)
-    with open(f"{dataset_slug}_{table_name}.csv.gz", mode="wb") as fobj:
-        fobj.write(response.read())
-    # TODO: o código acima pode ser melhorado de forma a não utilizar
-    # `response.read()` para não colocar todo oarquivo em memória e sim fazer
-    # streaming da resposta HTTP e salvar cada chunk diretamente no `fobj`.
-
-    # Caso queira percorrer o CSV em memória:
-    response = api.download(dataset_slug, table_name)
-    fobj = io.TextIOWrapper(gzip.GzipFile(fileobj=response), encoding="utf-8")
-    reader = csv.DictReader(fobj)
-    for row in reader:
-        pass  # faça algo com `row`
-
-    # Para navegar pela API:
-    filters = {"state": "PR", "is_last": True}
-    data = api.data(dataset_slug, table_name, filters)
-    for row in data:
-        pass  # faça algo com `row`
+    print(pd.json_normalize(temp["results"]))
+# %%
