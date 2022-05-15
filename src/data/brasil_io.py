@@ -12,7 +12,7 @@ import requests
 
 BASE_URL = "https://api.brasil.io/v1/"
 
-key = dotenv_values('../../.env')['BRASIL_IO_KEY']
+key = dotenv_values('../../.env')['BRASIL_IO_KEY_MARCO']
 
 
 class BrasilIO:
