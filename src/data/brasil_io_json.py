@@ -25,3 +25,5 @@ def read_json(path: str = caminho) -> pd.DataFrame:
 if __name__ == '__main__':
     caminho_main = '../../data/raw/base_brasilio.json'
     df = read_json(caminho_main)
+
+# teste
