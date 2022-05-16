@@ -1,6 +1,5 @@
 # %%
 
-import json
 import pandas as pd
 
 caminho = '../../data/raw/base_brasilio.json'
