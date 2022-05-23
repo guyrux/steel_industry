@@ -12,8 +12,6 @@ import requests
 
 BASE_URL = "https://api.brasil.io/v1/"
 
-key = dotenv_values('../../.env')['BRASIL_IO_KEY_MARCO']
-
 
 class BrasilIO:
 
@@ -47,6 +45,7 @@ class BrasilIO:
 
 
 if __name__ == "__main__":
+    key = dotenv_values('../../.env')['BRASIL_IO_KEY']
     api = BrasilIO(key)
     dataset_slug = 'gastos-deputados'
     table_name = 'cota_parlamentar'
